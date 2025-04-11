@@ -1,0 +1,192 @@
+{
+	"name": "pl_Iterateexcelfilesheey",
+	"properties": {
+		"activities": [
+			{
+				"name": "Until1",
+				"type": "Until",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@variables('Iserror')",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Set Temp Variable",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "tempcounter",
+								"value": {
+									"value": "@string(add(int(variables('counter')),1))",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Copy sheets from excel",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "Set Temp Variable",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "ExcelSource",
+									"storeSettings": {
+										"type": "AzureBlobFSReadSettings",
+										"recursive": true,
+										"enablePartitionDiscovery": false
+									}
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_excel",
+									"type": "DatasetReference",
+									"parameters": {
+										"FileName": {
+											"value": "@variables('Filename')",
+											"type": "Expression"
+										},
+										"InputPath": {
+											"value": "@variables('Filepath')",
+											"type": "Expression"
+										},
+										"Sheetindex": {
+											"value": "@int(variables('counter'))",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_excelsheets",
+									"type": "DatasetReference",
+									"parameters": {
+										"sheetname": {
+											"value": "sheet_@{variables('counter')}.csv",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "Set counter",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Copy sheets from excel",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "counter",
+								"value": {
+									"value": "@variables('tempcounter')",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set Iserror",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Copy sheets from excel",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "Iserror",
+								"value": {
+									"value": "@bool(1)",
+									"type": "Expression"
+								}
+							}
+						}
+					],
+					"timeout": "0.12:00:00"
+				}
+			}
+		],
+		"variables": {
+			"Filepath": {
+				"type": "String",
+				"defaultValue": "raw"
+			},
+			"Filename": {
+				"type": "String",
+				"defaultValue": "Sample - Superstore for Tableau 9.x versions.xls"
+			},
+			"counter": {
+				"type": "String",
+				"defaultValue": "0"
+			},
+			"tempcounter": {
+				"type": "String"
+			},
+			"Iserror": {
+				"type": "Boolean"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-04-11T09:01:55Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
