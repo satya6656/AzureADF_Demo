@@ -5,7 +5,14 @@
 			{
 				"name": "Until1",
 				"type": "Until",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Validate excel file",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"userProperties": [],
 				"typeProperties": {
 					"expression": {
@@ -162,6 +169,21 @@
 						}
 					],
 					"timeout": "0.12:00:00"
+				}
+			},
+			{
+				"name": "Validate excel file",
+				"type": "Validation",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "ds_ValidateExcel",
+						"type": "DatasetReference"
+					},
+					"timeout": "0.00:00:11",
+					"sleep": 10,
+					"minimumSize": 1024
 				}
 			}
 		],

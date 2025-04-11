@@ -1,0 +1,20 @@
+{
+	"name": "ds_ValidateExcel",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_adls",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"sheetName": "Orders",
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Sample - Superstore for Tableau 9.x versions.xls",
+				"fileSystem": "raw"
+			}
+		},
+		"schema": []
+	}
+}
